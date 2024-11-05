@@ -18,101 +18,61 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useBook } from "@/hooks/useBook";
+import { Book, BookStatus } from "@/types";
 import { Edit, Plus, Search, Star, Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-
-type Book = {
-  id: string;
-  title: string;
-  author: string;
-  genre: string;
-  status: "Por leer" | "Leyendo" | "Leído";
-  rating: number;
-};
-
-const initialBooks: Book[] = [
-  {
-    id: "1",
-    title: "Cien años de soledad",
-    author: "Gabriel García Márquez",
-    genre: "Realismo mágico",
-    status: "Leído",
-    rating: 5,
-  },
-  {
-    id: "2",
-    title: "El señor de los anillos",
-    author: "J.R.R. Tolkien",
-    genre: "Fantasía",
-    status: "Por leer",
-    rating: 4,
-  },
-  {
-    id: "3",
-    title: "1984",
-    author: "George Orwell",
-    genre: "Distopía",
-    status: "Leyendo",
-    rating: 4,
-  },
-];
+import React, { useState } from "react";
 
 export default function BookDashboard() {
-  const [books, setBooks] = useState<Book[]>(initialBooks);
-  const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [genreFilter, setGenreFilter] = useState<string>("");
-  const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const { state, dispatch } = useBook();
+  const { books, editingBookId, filter, searchTerm } = state;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [genreFilter, setGenreFilter] = useState<string | null>(null);
 
-  useEffect(() => {
-    let result = books;
-    if (statusFilter && statusFilter !== "all") {
-      result = result.filter((book) => book.status === statusFilter);
-    }
-    if (genreFilter && genreFilter !== "all") {
-      result = result.filter((book) => book.genre === genreFilter);
-    }
-    if (searchTerm) {
-      result = result.filter(
-        (book) =>
-          book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    setFilteredBooks(result);
-  }, [books, statusFilter, genreFilter, searchTerm]);
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatusFilter = filter === null || book.status === filter;
+    const matchesGenreFilter =
+      genreFilter === null || book.genre === genreFilter;
+    return matchesSearch && matchesStatusFilter && matchesGenreFilter;
+  });
 
   const handleAddBook = (newBook: Omit<Book, "id">) => {
-    const bookWithId = { ...newBook, id: Date.now().toString() };
-    setBooks([...books, bookWithId]);
+    const bookWithId = { ...newBook, id: Date.now() };
+    dispatch({ type: "ADD_BOOK", payload: { newBook: bookWithId } });
     setIsDialogOpen(false);
   };
 
-  const handleEditBook = (updatedBook: Omit<Book, "id">) => {
-    if (editingBook) {
-      const bookWithId = { ...updatedBook, id: editingBook.id };
-      setBooks(
-        books.map((book) => (book.id === editingBook.id ? bookWithId : book))
-      );
-      setEditingBook(null);
-      setIsDialogOpen(false);
-    }
+  const handleEditBook = (updatedBook: Book) => {
+    dispatch({ type: "EDIT_BOOK", payload: { updatedBook } });
+    setIsDialogOpen(false);
   };
 
-  const handleDeleteBook = (id: string) => {
-    setBooks(books.filter((book) => book.id !== id));
+  const handleDeleteBook = (id: number) => {
+    dispatch({ type: "DELETE_BOOK", payload: { id } });
   };
 
   const uniqueGenres = Array.from(new Set(books.map((book) => book.genre)));
+
+  const getStatusText = (status: BookStatus): string => {
+    switch (status) {
+      case BookStatus.TO_READ:
+        return "Por leer";
+      case BookStatus.READING:
+        return "Leyendo";
+      case BookStatus.READ:
+        return "Leído";
+      default:
+        return "Desconocido";
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header isDashboard={true} />
       <div className="container mx-auto p-4 flex-grow">
-        {/* <h1 className="text-3xl font-bold mb-6">Bibliophile Dashboard</h1> */}
-
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex-1 w-full md:w-auto relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -120,28 +80,55 @@ export default function BookDashboard() {
               type="text"
               placeholder="Buscar por título o autor..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_SEARCH",
+                  payload: { searchTerm: e.target.value },
+                })
+              }
               className="w-full pl-8"
             />
           </div>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select
+              value={filter !== null ? filter.toString() : "all"}
+              onValueChange={(value) =>
+                dispatch({
+                  type: "SET_FILTER",
+                  payload: {
+                    filter:
+                      value === "all" ? null : (Number(value) as BookStatus),
+                  },
+                })
+              }
+            >
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filtrar por estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Por leer">Por leer</SelectItem>
-                <SelectItem value="Leyendo">Leyendo</SelectItem>
-                <SelectItem value="Leído">Leído</SelectItem>
+                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value={BookStatus.TO_READ.toString()}>
+                  Por leer
+                </SelectItem>
+                <SelectItem value={BookStatus.READING.toString()}>
+                  Leyendo
+                </SelectItem>
+                <SelectItem value={BookStatus.READ.toString()}>
+                  Leído
+                </SelectItem>
               </SelectContent>
             </Select>
-            <Select value={genreFilter} onValueChange={setGenreFilter}>
+            <Select
+              value={genreFilter || "all"}
+              onValueChange={(value) =>
+                setGenreFilter(value === "all" ? null : value)
+              }
+            >
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filtrar por género" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="all">Todos los géneros</SelectItem>
                 {uniqueGenres.map((genre) => (
                   <SelectItem key={genre} value={genre}>
                     {genre}
@@ -159,19 +146,27 @@ export default function BookDashboard() {
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>
-                  {editingBook ? "Editar Libro" : "Añadir Nuevo Libro"}
+                  {editingBookId !== null
+                    ? "Editar Libro"
+                    : "Añadir Nuevo Libro"}
                 </DialogTitle>
                 <DialogDescription>
-                  {editingBook
+                  {editingBookId !== null
                     ? "Modifica los detalles del libro seleccionado."
                     : "Ingresa los detalles del nuevo libro."}
                 </DialogDescription>
               </DialogHeader>
               <BookForm
-                book={editingBook}
-                onSubmit={editingBook ? handleEditBook : handleAddBook}
+                book={
+                  editingBookId !== null
+                    ? books.find((b) => b.id === editingBookId) || null
+                    : null
+                }
+                onSubmit={
+                  editingBookId !== null ? handleEditBook : handleAddBook
+                }
                 onCancel={() => {
-                  setEditingBook(null);
+                  dispatch({ type: "SET_EDITING_BOOK", payload: { id: null } });
                   setIsDialogOpen(false);
                 }}
               />
@@ -195,7 +190,7 @@ export default function BookDashboard() {
                   <strong>Género:</strong> {book.genre}
                 </p>
                 <p>
-                  <strong>Estado:</strong> {book.status}
+                  <strong>Estado:</strong> {getStatusText(book.status)}
                 </p>
                 <div className="flex items-center">
                   <strong className="mr-2">Valoración:</strong>
@@ -215,7 +210,10 @@ export default function BookDashboard() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setEditingBook(book);
+                      dispatch({
+                        type: "SET_EDITING_BOOK",
+                        payload: { id: book.id },
+                      });
                       setIsDialogOpen(true);
                     }}
                   >
@@ -239,8 +237,8 @@ export default function BookDashboard() {
 }
 
 type BookFormProps = {
-  book?: Book | null;
-  onSubmit: (book: Omit<Book, "id">) => void;
+  book: Book | null;
+  onSubmit: (book: Book) => void;
   onCancel: () => void;
 };
 
@@ -248,14 +246,21 @@ function BookForm({ book, onSubmit, onCancel }: BookFormProps) {
   const [title, setTitle] = useState(book?.title || "");
   const [author, setAuthor] = useState(book?.author || "");
   const [genre, setGenre] = useState(book?.genre || "");
-  const [status, setStatus] = useState<Book["status"]>(
-    book?.status || "Por leer"
+  const [status, setStatus] = useState<BookStatus>(
+    book?.status || BookStatus.TO_READ
   );
   const [rating, setRating] = useState(book?.rating || 1);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newBook: Omit<Book, "id"> = { title, author, genre, status, rating };
+    const newBook: Book = {
+      id: book?.id || Date.now(),
+      title,
+      author,
+      genre,
+      status,
+      rating,
+    };
     onSubmit(newBook);
   };
 
@@ -291,16 +296,20 @@ function BookForm({ book, onSubmit, onCancel }: BookFormProps) {
       <div>
         <Label htmlFor="status">Estado</Label>
         <Select
-          value={status}
-          onValueChange={(value: Book["status"]) => setStatus(value)}
+          value={status.toString()}
+          onValueChange={(value) => setStatus(Number(value) as BookStatus)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Seleccionar estado" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Por leer">Por leer</SelectItem>
-            <SelectItem value="Leyendo">Leyendo</SelectItem>
-            <SelectItem value="Leído">Leído</SelectItem>
+            <SelectItem value={BookStatus.TO_READ.toString()}>
+              Por leer
+            </SelectItem>
+            <SelectItem value={BookStatus.READING.toString()}>
+              Leyendo
+            </SelectItem>
+            <SelectItem value={BookStatus.READ.toString()}>Leído</SelectItem>
           </SelectContent>
         </Select>
       </div>
