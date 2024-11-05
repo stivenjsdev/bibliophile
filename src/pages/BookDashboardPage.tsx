@@ -21,7 +21,7 @@ import {
 import { useBook } from "@/hooks/useBook";
 import { Book, BookStatus } from "@/types";
 import { Edit, Plus, Search, Star, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 export default function BookDashboard() {
   const { state, dispatch } = useBook();
@@ -29,34 +29,45 @@ export default function BookDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [genreFilter, setGenreFilter] = useState<string | null>(null);
 
-  const filteredBooks = books.filter((book) => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatusFilter = filter === null || book.status === filter;
-    const matchesGenreFilter =
-      genreFilter === null || book.genre === genreFilter;
-    return matchesSearch && matchesStatusFilter && matchesGenreFilter;
-  });
+  const filteredBooks = useMemo(() => {
+    return books.filter((book) => {
+      const matchesSearch =
+        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatusFilter = filter === null || book.status === filter;
+      const matchesGenreFilter =
+        genreFilter === null || book.genre === genreFilter;
+      return matchesSearch && matchesStatusFilter && matchesGenreFilter;
+    });
+  }, [books, searchTerm, filter, genreFilter]);
 
-  const handleAddBook = (newBook: Omit<Book, "id">) => {
-    const bookWithId = { ...newBook, id: Date.now() };
-    dispatch({ type: "ADD_BOOK", payload: { newBook: bookWithId } });
-    setIsDialogOpen(false);
-  };
+  const handleAddBook = useCallback(
+    (newBook: Omit<Book, "id">) => {
+      const bookWithId = { ...newBook, id: Date.now() };
+      dispatch({ type: "ADD_BOOK", payload: { newBook: bookWithId } });
+      setIsDialogOpen(false);
+    },
+    [dispatch]
+  );
 
-  const handleEditBook = (updatedBook: Book) => {
-    dispatch({ type: "EDIT_BOOK", payload: { updatedBook } });
-    setIsDialogOpen(false);
-  };
+  const handleEditBook = useCallback(
+    (updatedBook: Book) => {
+      dispatch({ type: "EDIT_BOOK", payload: { updatedBook } });
+      setIsDialogOpen(false);
+    },
+    [dispatch]
+  );
 
   const handleDeleteBook = (id: number) => {
     dispatch({ type: "DELETE_BOOK", payload: { id } });
   };
 
-  const uniqueGenres = Array.from(new Set(books.map((book) => book.genre)));
+  const uniqueGenres = useMemo(
+    () => Array.from(new Set(books.map((book) => book.genre))),
+    [books]
+  );
 
-  const getStatusText = (status: BookStatus): string => {
+  const getStatusText = useCallback((status: BookStatus): string => {
     switch (status) {
       case BookStatus.TO_READ:
         return "Por leer";
@@ -67,6 +78,33 @@ export default function BookDashboard() {
       default:
         return "Desconocido";
     }
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: "SET_SEARCH", payload: { searchTerm: e.target.value } });
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    dispatch({
+      type: "SET_FILTER",
+      payload: {
+        filter: value === "all" ? null : (Number(value) as BookStatus),
+      },
+    });
+  };
+
+  const handleGenreFilterChange = (value: string) => {
+    setGenreFilter(value === "all" ? null : value);
+  };
+
+  const handleEditClick = (id: number) => {
+    dispatch({ type: "SET_EDITING_BOOK", payload: { id } });
+    setIsDialogOpen(true);
+  };
+
+  const handleCancelEdit = () => {
+    dispatch({ type: "SET_EDITING_BOOK", payload: { id: null } });
+    setIsDialogOpen(false);
   };
 
   return (
@@ -80,27 +118,14 @@ export default function BookDashboard() {
               type="text"
               placeholder="Buscar por título o autor..."
               value={searchTerm}
-              onChange={(e) =>
-                dispatch({
-                  type: "SET_SEARCH",
-                  payload: { searchTerm: e.target.value },
-                })
-              }
+              onChange={handleSearchChange}
               className="w-full pl-8"
             />
           </div>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto">
             <Select
               value={filter !== null ? filter.toString() : "all"}
-              onValueChange={(value) =>
-                dispatch({
-                  type: "SET_FILTER",
-                  payload: {
-                    filter:
-                      value === "all" ? null : (Number(value) as BookStatus),
-                  },
-                })
-              }
+              onValueChange={handleStatusFilterChange}
             >
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filtrar por estado" />
@@ -120,9 +145,7 @@ export default function BookDashboard() {
             </Select>
             <Select
               value={genreFilter || "all"}
-              onValueChange={(value) =>
-                setGenreFilter(value === "all" ? null : value)
-              }
+              onValueChange={handleGenreFilterChange}
             >
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filtrar por género" />
@@ -165,10 +188,7 @@ export default function BookDashboard() {
                 onSubmit={
                   editingBookId !== null ? handleEditBook : handleAddBook
                 }
-                onCancel={() => {
-                  dispatch({ type: "SET_EDITING_BOOK", payload: { id: null } });
-                  setIsDialogOpen(false);
-                }}
+                onCancel={handleCancelEdit}
               />
             </DialogContent>
           </Dialog>
@@ -209,13 +229,7 @@ export default function BookDashboard() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      dispatch({
-                        type: "SET_EDITING_BOOK",
-                        payload: { id: book.id },
-                      });
-                      setIsDialogOpen(true);
-                    }}
+                    onClick={() => handleEditClick(book.id)}
                   >
                     <Edit className="mr-2 h-4 w-4" /> Editar
                   </Button>
@@ -242,7 +256,7 @@ type BookFormProps = {
   onCancel: () => void;
 };
 
-function BookForm({ book, onSubmit, onCancel }: BookFormProps) {
+const BookForm = React.memo(({ book, onSubmit, onCancel }: BookFormProps) => {
   const [title, setTitle] = useState(book?.title || "");
   const [author, setAuthor] = useState(book?.author || "");
   const [genre, setGenre] = useState(book?.genre || "");
@@ -339,4 +353,6 @@ function BookForm({ book, onSubmit, onCancel }: BookFormProps) {
       </div>
     </form>
   );
-}
+});
+
+BookForm.displayName = "BookForm";
