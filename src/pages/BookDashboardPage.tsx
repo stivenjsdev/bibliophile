@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -109,7 +108,6 @@ export default function BookDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header isDashboard={true} />
       <div className="container mx-auto p-4 flex-grow">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex-1 w-full md:w-auto relative">

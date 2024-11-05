@@ -1,39 +1,31 @@
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 type HeaderProps = {
-  isDashboard?: boolean;
+  isDashboard: boolean;
 };
 
-const Header = ({ isDashboard = false }: HeaderProps) => {
+const Header = ({ isDashboard }: HeaderProps) => {
   return (
-    <header className="w-full bg-white shadow py-4">
-      <nav className="container mx-auto flex justify-between items-center px-4">
-        <h1 className="text-3xl font-bold text-[rgb(255,92,53)]">
+    <header className="bg-white shadow-sm">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link to="/" className="text-2xl font-bold text-[rgb(255,92,53)]">
           Bibliophile
-        </h1>
-        <div className="flex space-x-4">
+        </Link>
+        <nav>
           {isDashboard ? (
-            <Button
-              variant="ghost"
-              className="text-gray-700 hover:text-[rgb(255,92,53)]"
-            >
-              Cerrar sesión
-            </Button>
+            <Link to="/" className="text-primary hover:text-primary-dark">
+              Salir
+            </Link>
           ) : (
-            <>
-              <Button
-                variant="ghost"
-                className="text-gray-700 hover:text-[rgb(255,92,53)] hidden md:inline"
-              >
-                Iniciar sesión
-              </Button>
-              <Button className="bg-[rgb(255,92,53)] text-white font-semibold hover:bg-[rgb(255,120,70)]">
-                Prueba Gratis
-              </Button>
-            </>
+            <Link
+              to="/dashboard"
+              className="text-primary hover:text-primary-dark"
+            >
+              Dashboard
+            </Link>
           )}
-        </div>
-      </nav>
+        </nav>
+      </div>
     </header>
   );
 };

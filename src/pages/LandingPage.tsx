@@ -1,6 +1,5 @@
 import heroImage from "@/assets/hero-image.webp";
 import CustomerReviews from "@/components/CustomerReviews";
-import Header from "@/components/Header";
 import useScrollToTop from "@/hooks/useScrollToTop";
 import { lazy } from "react";
 import {
@@ -21,80 +20,69 @@ const LandingPage = ({ scrollPosition }: LandingPageProps) => {
 
   return (
     <div className="min-h-screen bg-[rgb(254,244,234)] flex flex-col">
-      {/* Header */}
-      <Header />
+      {/* Hero Section */}
+      <section className="container mx-auto text-center py-12 px-4 md:py-16">
+        <h2 className="text-3xl md:text-5xl font-bold text-[rgb(34,34,34)] mb-4">
+          Potencia tus Lecturas
+        </h2>
+        <p className="text-lg text-[rgb(119,119,119)] mb-7">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae nam at
+          ratione itaque cupiditate, illo esse quidem optio repudiandae nemo vel
+          accusantium, architecto, ab assumenda voluptatum possimus a aspernatur
+          delectus mollitia expedita neque sunt est deserunt tempore. Quibusdam
+          reprehenderit nulla fugiat? Magnam recusandae inventore cumque
+          deserunt nulla omnis itaque repellendus?
+        </p>
+        <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+          <button className="px-6 py-3 bg-[rgb(255,92,53)] text-white font-semibold rounded-lg shadow hover:bg-[rgb(255,120,70)]">
+            Prueba Gratis
+          </button>
+          <button className="px-6 py-3 border border-[rgb(255,92,53)] text-[rgb(255,92,53)] font-semibold rounded-lg hover:bg-[rgb(254,244,234)]">
+            Ver características
+          </button>
+        </div>
+      </section>
 
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="container mx-auto text-center py-12 px-4 md:py-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-[rgb(34,34,34)] mb-4">
-            Potencia tus Lecturas
-          </h2>
-          <p className="text-lg text-[rgb(119,119,119)] mb-7">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae nam at
-            ratione itaque cupiditate, illo esse quidem optio repudiandae nemo
-            vel accusantium, architecto, ab assumenda voluptatum possimus a
-            aspernatur delectus mollitia expedita neque sunt est deserunt
-            tempore. Quibusdam reprehenderit nulla fugiat? Magnam recusandae
-            inventore cumque deserunt nulla omnis itaque repellendus?
-          </p>
-          <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
-            <button className="px-6 py-3 bg-[rgb(255,92,53)] text-white font-semibold rounded-lg shadow hover:bg-[rgb(255,120,70)]">
-              Prueba Gratis
-            </button>
-            <button className="px-6 py-3 border border-[rgb(255,92,53)] text-[rgb(255,92,53)] font-semibold rounded-lg hover:bg-[rgb(254,244,234)]">
-              Ver características
-            </button>
+      {/* Informative Sections */}
+      <section className="w-full bg-white h-[539px]">
+        <div className="container mx-auto py-16 px-4 md:flex md:space-x-8 items-center">
+          <div className="flex-1 mb-8 md:mb-0 text-center md:text-left">
+            <h3 className="text-3xl font-semibold text-[rgb(34,34,34)] mb-4">
+              Características Avanzadas
+            </h3>
+            <p className="text-[rgb(119,119,119)]">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+              varius metus at eros feugiat fringilla.
+            </p>
           </div>
-        </section>
-
-        {/* Informative Sections */}
-        <section className="w-full bg-white h-[539px]">
-          <div className="container mx-auto py-16 px-4 md:flex md:space-x-8 items-center">
-            <div className="flex-1 mb-8 md:mb-0 text-center md:text-left">
-              <h3 className="text-3xl font-semibold text-[rgb(34,34,34)] mb-4">
-                Características Avanzadas
-              </h3>
-              <p className="text-[rgb(119,119,119)]">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-                varius metus at eros feugiat fringilla.
-              </p>
-            </div>
-            <div className="w-full md:w-1/2 lg:w-[600px] mx-auto">
-              <LazyLoadImage
-                alt="Feature illustration"
-                // src="https://picsum.photos/600/400.webp"
-                src={heroImage}
-                scrollPosition={scrollPosition}
-                className="rounded-lg shadow-lg w-full h-auto" // Imagen responsive
-                // width="100%"
-                // height="auto"
-                // placeholderSrc="https://placehold.co/600x400.webp"
-                visibleByDefault={true}
-                // placeholder={<div className="w-[600] h-[400] bg-gray-200 rounded-lg" />}
-              />
-            </div>
+          <div className="w-full md:w-1/2 lg:w-[600px] mx-auto">
+            <LazyLoadImage
+              alt="Feature illustration"
+              src={heroImage}
+              scrollPosition={scrollPosition}
+              className="rounded-lg shadow-lg w-full h-auto"
+              visibleByDefault={true}
+            />
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Testimonials Section */}
-        <section className="container mx-auto py-16 text-center px-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-[rgb(34,34,34)] mb-8">
-            Nuestros Clientes
-          </h2>
-          <CustomerReviews scrollPosition={scrollPosition} />
-        </section>
+      {/* Testimonials Section */}
+      <section className="container mx-auto py-16 text-center px-4">
+        <h2 className="text-3xl md:text-5xl font-bold text-[rgb(34,34,34)] mb-8">
+          Nuestros Clientes
+        </h2>
+        <CustomerReviews scrollPosition={scrollPosition} />
+      </section>
 
-        {/* <ImageGallery scrollPosition={scrollPosition} /> */}
+      {/* Lazy Component */}
+      <LazyLoadComponent
+        scrollPosition={scrollPosition}
+        placeholder={<div>Loading...</div>}
+      >
+        <LazyComponent />
+      </LazyLoadComponent>
 
-        {/* Lazy Component */}
-        <LazyLoadComponent
-          scrollPosition={scrollPosition}
-          placeholder={<div>Loading...</div>}
-        >
-          <LazyComponent />
-        </LazyLoadComponent>
-      </main>
       {/* Footer */}
       <LazyLoadComponent scrollPosition={scrollPosition}>
         <footer className="w-full bg-gray-800 py-8 text-gray-200">
