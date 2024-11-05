@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const [phone, setPhone] = useState("");
@@ -23,10 +24,13 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       await login(phone, password);
+      toast.success("Inicio de sesión exitoso. ¡Bienvenido!");
       navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
-      // Manejar el error (por ejemplo, mostrar un mensaje al usuario)
+      toast.error(
+        "Error en el inicio de sesión. Por favor, verifica tus credenciales e intenta de nuevo."
+      );
     }
   };
 

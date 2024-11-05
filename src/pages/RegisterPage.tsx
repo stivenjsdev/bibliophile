@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -25,9 +26,12 @@ const RegisterPage = () => {
     try {
       await register(name, phone, password);
       navigate("/dashboard");
+      toast.success("Registro exitoso. ¡Bienvenido!");
     } catch (error) {
       console.error("Registration failed:", error);
-      // Manejar el error (por ejemplo, mostrar un mensaje al usuario)
+      toast.error(
+        "Error en el registro. Por favor, verifica tus datos e inténtalo de nuevo."
+      );
     }
   };
 
@@ -70,6 +74,9 @@ const RegisterPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={7}
+                  pattern=".{7,}"
+                  title="La contraseña debe tener al menos 7 caracteres"
                 />
               </div>
             </div>

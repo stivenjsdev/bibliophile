@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import { Outlet, useLocation } from "react-router-dom";
+import { Toaster } from "sonner";
 
 const Layout = () => {
   const location = useLocation();
@@ -11,6 +12,7 @@ const Layout = () => {
       <main>
         <Outlet />
       </main>
+      <Toaster position="top-center" />
     </>
   );
 };
