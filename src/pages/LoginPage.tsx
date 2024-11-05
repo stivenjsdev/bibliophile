@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -17,11 +18,13 @@ import { toast } from "sonner";
 const LoginPage = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await login(phone, password);
       toast.success("Inicio de sesión exitoso. ¡Bienvenido!");
@@ -31,6 +34,8 @@ const LoginPage = () => {
       toast.error(
         "Error en el inicio de sesión. Por favor, verifica tus credenciales e intenta de nuevo."
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -68,8 +73,15 @@ const LoginPage = () => {
                 />
               </div>
             </div>
-            <Button className="w-full mt-6" type="submit">
-              Iniciar sesión
+            <Button className="w-full mt-6" type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                "Iniciar sesión"
+              )}
             </Button>
           </form>
         </CardContent>

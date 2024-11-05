@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,11 +19,13 @@ const RegisterPage = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await register(name, phone, password);
       navigate("/dashboard");
@@ -32,6 +35,8 @@ const RegisterPage = () => {
       toast.error(
         "Error en el registro. Por favor, verifica tus datos e inténtalo de nuevo."
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,14 +79,21 @@ const RegisterPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={7}
-                  pattern=".{7,}"
-                  title="La contraseña debe tener al menos 7 caracteres"
+                  minLength={6}
+                  pattern=".{6,}"
+                  title="La contraseña debe tener al menos 6 caracteres"
                 />
               </div>
             </div>
-            <Button className="w-full mt-6" type="submit">
-              Registrarse
+            <Button className="w-full mt-6" type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                "Registrarse"
+              )}
             </Button>
           </form>
         </CardContent>
