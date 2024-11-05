@@ -1,9 +1,9 @@
-import LandingPage from "@/pages/LandingPage";
+import BookDashboard from "@/pages/BookDashboardPage";
 
 function App() {
   return (
     <>
-      <LandingPage />
+      <BookDashboard />
     </>
   );
 }
