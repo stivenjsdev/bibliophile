@@ -18,3 +18,18 @@ export type User = {
   name: string;
   phone: string;
 };
+
+export interface PaginationData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface BookFilters {
+  title?: string;
+  author?: string;
+  genre?: string;
+  status?: BookStatus;
+  rating?: number;
+}

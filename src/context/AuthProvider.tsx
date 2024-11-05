@@ -11,6 +11,7 @@ type AuthContextProviderProps = {
 
 export const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const validateToken = async () => {
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
           localStorage.removeItem("token");
         }
       }
+      setLoading(false);
     };
 
     validateToken();
@@ -70,7 +72,7 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

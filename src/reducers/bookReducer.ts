@@ -1,80 +1,74 @@
-import { Book, BookStatus } from "../types/index";
+import { Book, PaginationData } from "../types";
+
+export interface BookState {
+  books: Book[];
+  pagination: PaginationData;
+  loading: boolean;
+  error: string | null;
+}
 
 export type BookActions =
-  | { type: "ADD_BOOK"; payload: { newBook: Book } }
-  | { type: "EDIT_BOOK"; payload: { updatedBook: Book } }
-  | { type: "DELETE_BOOK"; payload: { id: Book["id"] } }
-  | { type: "SET_EDITING_BOOK"; payload: { id: Book["id"] | null } }
-  | { type: "SET_FILTER"; payload: { filter: BookStatus | null } }
-  | { type: "SET_SEARCH"; payload: { searchTerm: string } };
-
-export type BookState = {
-  books: Book[];
-  editingBookId: Book["id"] | null;
-  filter: BookStatus | null;
-  searchTerm: string;
-};
-
-const localStorageBooks = (): Book[] => {
-  const books = localStorage.getItem("books");
-  return books ? JSON.parse(books) : [];
-};
+  | { type: "FETCH_BOOKS_START" }
+  | {
+      type: "FETCH_BOOKS_SUCCESS";
+      payload: { books: Book[]; pagination: PaginationData };
+    }
+  | { type: "FETCH_BOOKS_ERROR"; payload: string }
+  | { type: "ADD_BOOK"; payload: Book }
+  | { type: "UPDATE_BOOK"; payload: Book }
+  | { type: "DELETE_BOOK"; payload: number };
 
 export const initialState: BookState = {
-  books: localStorageBooks(),
-  editingBookId: null,
-  filter: null,
-  searchTerm: "",
+  books: [],
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  loading: false,
+  error: null,
 };
 
 export const bookReducer = (
-  state: BookState = initialState,
+  state: BookState,
   action: BookActions
 ): BookState => {
-  if (action.type === "ADD_BOOK") {
+  if (action.type === "FETCH_BOOKS_START") {
+    return { ...state, loading: true, error: null };
+  }
+
+  if (action.type === "FETCH_BOOKS_SUCCESS") {
     return {
       ...state,
-      books: [...state.books, action.payload.newBook],
+      loading: false,
+      books: action.payload.books,
+      pagination: action.payload.pagination,
+      error: null,
     };
   }
 
-  if (action.type === "EDIT_BOOK") {
+  if (action.type === "FETCH_BOOKS_ERROR") {
+    return { ...state, loading: false, error: action.payload };
+  }
+
+  if (action.type === "ADD_BOOK") {
+    return { ...state, books: [action.payload, ...state.books] };
+  }
+
+  if (action.type === "UPDATE_BOOK") {
     return {
       ...state,
       books: state.books.map((book) =>
-        book.id === action.payload.updatedBook.id
-          ? action.payload.updatedBook
-          : book
+        book.id === action.payload.id ? action.payload : book
       ),
-      editingBookId: null,
     };
   }
 
   if (action.type === "DELETE_BOOK") {
     return {
       ...state,
-      books: state.books.filter((book) => book.id !== action.payload.id),
-    };
-  }
-
-  if (action.type === "SET_EDITING_BOOK") {
-    return {
-      ...state,
-      editingBookId: action.payload.id,
-    };
-  }
-
-  if (action.type === "SET_FILTER") {
-    return {
-      ...state,
-      filter: action.payload.filter,
-    };
-  }
-
-  if (action.type === "SET_SEARCH") {
-    return {
-      ...state,
-      searchTerm: action.payload.searchTerm,
+      books: state.books.filter((book) => book.id !== action.payload),
     };
   }
 
