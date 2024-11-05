@@ -12,3 +12,9 @@ export type Book = {
   status: BookStatus;
   rating: number;
 };
+
+export type User = {
+  id: number;
+  name: string;
+  phone: string;
+};
