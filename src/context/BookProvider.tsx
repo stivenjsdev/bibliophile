@@ -94,9 +94,23 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
     }
   };
 
+  const fetchGenres = async () => {
+    try {
+      const genreList = await bookService.getAllGenres();
+      dispatch({ type: "FETCH_GENRES_SUCCESS", payload: genreList });
+    } catch (error) {
+      console.error("Error fetching genres:", error);
+      dispatch({
+        type: "FETCH_BOOKS_ERROR",
+        payload: "Error al obtener los géneros",
+      });
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchBooks();
+      fetchGenres();
     } else {
       // Reset books state when user logs out
       dispatch({
@@ -106,6 +120,7 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
           pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
         },
       });
+      dispatch({ type: "FETCH_GENRES_SUCCESS", payload: [] });
     }
   }, [user]);
 
@@ -119,6 +134,7 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
         addBook,
         updateBook,
         deleteBook,
+        fetchGenres,
       }}
     >
       {children}

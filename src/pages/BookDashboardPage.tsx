@@ -13,25 +13,21 @@ import {
 import { useBook } from "@/hooks/useBook";
 import { Book, BookFilters, BookStatus } from "@/types";
 import { Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function BookDashboard() {
-  const { state, fetchBooks, searchBooks, addBook, updateBook, deleteBook } =
+  const { state, fetchBooks, searchBooks, addBook, updateBook, deleteBook, fetchGenres } =
     useBook();
-  const { books, pagination, loading, error } = state;
+  const { books, pagination, loading, error, genres } = state;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [filters, setFilters] = useState<BookFilters>({});
 
   useEffect(() => {
     fetchBooks();
+    fetchGenres();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const uniqueGenres = useMemo(() => {
-    const genres = new Set(books.map((book) => book.genre));
-    return Array.from(genres);
-  }, [books]);
 
   const handleSearch = useCallback(() => {
     searchBooks(filters);
@@ -103,7 +99,7 @@ export default function BookDashboard() {
           filters={filters}
           onFilterChange={handleFilterChange}
           onSearch={handleSearch}
-          uniqueGenres={uniqueGenres}
+          uniqueGenres={genres}
         />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>

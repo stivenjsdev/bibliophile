@@ -53,6 +53,13 @@ const bookService = {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
   },
+
+  getAllGenres: async (): Promise<string[]> => {
+    const response = await axios.get(`${API_URL}/api/books/genres`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    return response.data;
+  },
 };
 
 export default bookService;

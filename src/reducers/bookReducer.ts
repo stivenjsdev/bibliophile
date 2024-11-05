@@ -3,6 +3,7 @@ import { Book, PaginationData } from "../types";
 export interface BookState {
   books: Book[];
   pagination: PaginationData;
+  genres: string[];
   loading: boolean;
   error: string | null;
 }
@@ -16,7 +17,8 @@ export type BookActions =
   | { type: "FETCH_BOOKS_ERROR"; payload: string }
   | { type: "ADD_BOOK"; payload: Book }
   | { type: "UPDATE_BOOK"; payload: Book }
-  | { type: "DELETE_BOOK"; payload: number };
+  | { type: "DELETE_BOOK"; payload: number }
+  | { type: "FETCH_GENRES_SUCCESS"; payload: string[] };
 
 export const initialState: BookState = {
   books: [],
@@ -26,6 +28,7 @@ export const initialState: BookState = {
     total: 0,
     totalPages: 0,
   },
+  genres: [],
   loading: false,
   error: null,
 };
@@ -70,6 +73,10 @@ export const bookReducer = (
       ...state,
       books: state.books.filter((book) => book.id !== action.payload),
     };
+  }
+
+  if (action.type === "FETCH_GENRES_SUCCESS") {
+    return { ...state, genres: action.payload };
   }
 
   return state;

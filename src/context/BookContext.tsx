@@ -14,6 +14,7 @@ type BookContextType = {
   addBook: (book: Omit<Book, "id">) => Promise<void>;
   updateBook: (id: number, book: Partial<Book>) => Promise<void>;
   deleteBook: (id: number) => Promise<void>;
+  fetchGenres: () => Promise<void>;
 };
 
 export const BookContext = createContext<BookContextType>(null!);
