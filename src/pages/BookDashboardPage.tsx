@@ -1,3 +1,4 @@
+import { BookDashboardSkeleton } from "@/components/BookDashboardSkeleton";
 import { BookForm } from "@/components/BookForm";
 import { BookList } from "@/components/BookList";
 import { BookSearch } from "@/components/BookSearch";
@@ -16,8 +17,15 @@ import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export default function BookDashboard() {
-  const { state, fetchBooks, searchBooks, addBook, updateBook, deleteBook, fetchGenres } =
-    useBook();
+  const {
+    state,
+    fetchBooks,
+    searchBooks,
+    addBook,
+    updateBook,
+    deleteBook,
+    fetchGenres,
+  } = useBook();
   const { books, pagination, loading, error, genres } = state;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
@@ -89,7 +97,7 @@ export default function BookDashboard() {
     setIsDialogOpen(false);
   };
 
-  if (loading) return <div>Cargando...</div>;
+  if (loading) return <BookDashboardSkeleton />;
   if (error) return <div>Error: {error}</div>;
 
   return (

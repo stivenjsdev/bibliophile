@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 const bookService = {
   getAllBooks: async (
     page: number = 1,
-    limit: number = 10
+    limit: number = 6
   ): Promise<{ books: Book[]; pagination: PaginationData }> => {
     const response = await axios.get(`${API_URL}/api/books`, {
       params: { page, limit },
@@ -18,7 +18,7 @@ const bookService = {
   searchBooks: async (
     filters: BookFilters,
     page: number = 1,
-    limit: number = 4
+    limit: number = 6
   ): Promise<{ books: Book[]; pagination: PaginationData }> => {
     const response = await axios.get(`${API_URL}/api/books/search`, {
       params: { ...filters, page, limit },

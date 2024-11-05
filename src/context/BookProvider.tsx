@@ -13,7 +13,7 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
   const [state, dispatch] = useReducer(bookReducer, initialState);
   const { user } = useAuth();
 
-  const fetchBooks = async (page: number = 1, limit: number = 4) => {
+  const fetchBooks = async (page: number = 1, limit: number = 6) => {
     dispatch({ type: "FETCH_BOOKS_START" });
     try {
       const response = await bookService.getAllBooks(page, limit);
