@@ -2,7 +2,7 @@ import heroImage from "@/assets/hero-image.webp";
 import CustomerReviews from "@/components/CustomerReviews";
 import Header from "@/components/Header";
 import LazyComponent from "@/components/LazyComponent";
-import { useEffect, useState } from "react";
+import useScrollToTop from "@/hooks/useScrollToTop";
 import {
   LazyLoadComponent,
   LazyLoadImage,
@@ -15,21 +15,8 @@ type LandingPageProps = {
 };
 
 const LandingPage = ({ scrollPosition }: LandingPageProps) => {
-  const [showScrollTopButton, setShowScrollTopButton] = useState(false);
+  const { scrollToTop, showScrollTopButton } = useScrollToTop();
 
-  // Manejar la visibilidad del botón de scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTopButton(window.scrollY > 300); // Mostrar si el scroll es mayor a 300px
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Función para hacer scroll al inicio de la página
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
   return (
     <div className="min-h-screen bg-[rgb(254,244,234)] flex flex-col">
       {/* Header */}
