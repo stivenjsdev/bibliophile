@@ -18,10 +18,15 @@ const bookService = {
   searchBooks: async (
     filters: BookFilters,
     page: number = 1,
-    limit: number = 6
+    limit: number = 4
   ): Promise<{ books: Book[]; pagination: PaginationData }> => {
     const response = await axios.get(`${API_URL}/api/books/search`, {
-      params: { ...filters, page, limit },
+      params: {
+        ...filters,
+        page,
+        limit,
+        search: filters.title, // Usamos 'search' en lugar de 'title'
+      },
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;

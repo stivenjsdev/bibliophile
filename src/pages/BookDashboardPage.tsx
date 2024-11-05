@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { useBook } from "@/hooks/useBook";
 import { Book, BookFilters, BookStatus } from "@/types";
+import debounce from "lodash/debounce";
 import { Plus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function BookDashboard() {
   const {
@@ -37,9 +38,30 @@ export default function BookDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((filters: BookFilters) => {
+        searchBooks(filters);
+      }, 500),
+    [searchBooks]
+  );
+
   const handleSearch = useCallback(() => {
     searchBooks(filters);
   }, [searchBooks, filters]);
+
+  const handleFilterChange = useCallback(
+    (key: keyof BookFilters, value: string | number | null) => {
+      setFilters((prev) => {
+        const newFilters = { ...prev, [key]: value };
+        if (key === "title") {
+          debouncedSearch(newFilters);
+        }
+        return newFilters;
+      });
+    },
+    [debouncedSearch]
+  );
 
   const handleAddBook = useCallback(
     async (newBook: Omit<Book, "id">) => {
@@ -66,13 +88,6 @@ export default function BookDashboard() {
     },
     [deleteBook]
   );
-
-  const handleFilterChange = (
-    key: keyof BookFilters,
-    value: string | number | null
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
 
   const getStatusText = useCallback((status: BookStatus): string => {
     switch (status) {
@@ -108,6 +123,7 @@ export default function BookDashboard() {
           onFilterChange={handleFilterChange}
           onSearch={handleSearch}
           uniqueGenres={genres}
+          autoFocus={true}
         />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
