@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BookFilters, BookStatus } from "@/types";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 type BookSearchProps = {
@@ -34,6 +35,13 @@ export const BookSearch = ({
     }
   }, [autoFocus]);
 
+  const handleClearInput = () => {
+    onFilterChange("title", "");
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
       <div className="flex-1 w-full md:w-auto relative">
@@ -44,8 +52,20 @@ export const BookSearch = ({
           placeholder="Buscar por título o autor..."
           value={filters.title || ""}
           onChange={(e) => onFilterChange("title", e.target.value)}
-          className="w-full pl-8"
+          className="w-full pl-8 pr-12"
         />
+        {filters.title && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+            onClick={handleClearInput}
+            aria-label="Limpiar búsqueda"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
       </div>
       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto">
         <Select
