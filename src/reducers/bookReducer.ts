@@ -1,4 +1,4 @@
-import { Book, PaginationData } from "../types";
+import { Book, BookFilters, PaginationData } from "../types";
 
 export interface BookState {
   books: Book[];
@@ -6,6 +6,7 @@ export interface BookState {
   genres: string[];
   loading: boolean;
   error: string | null;
+  currentFilters: BookFilters;
 }
 
 export type BookActions =
@@ -18,7 +19,8 @@ export type BookActions =
   | { type: "ADD_BOOK"; payload: Book }
   | { type: "UPDATE_BOOK"; payload: Book }
   | { type: "DELETE_BOOK"; payload: number }
-  | { type: "FETCH_GENRES_SUCCESS"; payload: string[] };
+  | { type: "FETCH_GENRES_SUCCESS"; payload: string[] }
+  | { type: "UPDATE_FILTERS"; payload: BookFilters };
 
 export const initialState: BookState = {
   books: [],
@@ -31,6 +33,7 @@ export const initialState: BookState = {
   genres: [],
   loading: false,
   error: null,
+  currentFilters: {},
 };
 
 export const bookReducer = (
@@ -77,6 +80,10 @@ export const bookReducer = (
 
   if (action.type === "FETCH_GENRES_SUCCESS") {
     return { ...state, genres: action.payload };
+  }
+
+  if (action.type === "UPDATE_FILTERS") {
+    return { ...state, currentFilters: action.payload };
   }
 
   return state;

@@ -13,10 +13,14 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
   const [state, dispatch] = useReducer(bookReducer, initialState);
   const { user } = useAuth();
 
-  const fetchBooks = async (page: number = 1, limit: number = 6) => {
+  const fetchBooks = async (
+    page: number = 1,
+    limit: number = 6,
+    filters: BookFilters = {}
+  ) => {
     dispatch({ type: "FETCH_BOOKS_START" });
     try {
-      const response = await bookService.getAllBooks(page, limit);
+      const response = await bookService.searchBooks(filters, page, limit);
       dispatch({ type: "FETCH_BOOKS_SUCCESS", payload: response });
     } catch (error) {
       dispatch({
@@ -32,21 +36,10 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
   const searchBooks = async (
     filters: BookFilters,
     page: number = 1,
-    limit: number = 4
+    limit: number = 6
   ) => {
-    dispatch({ type: "FETCH_BOOKS_START" });
-    try {
-      const response = await bookService.searchBooks(filters, page, limit);
-      dispatch({ type: "FETCH_BOOKS_SUCCESS", payload: response });
-    } catch (error) {
-      dispatch({
-        type: "FETCH_BOOKS_ERROR",
-        payload:
-          error instanceof Error
-            ? error.message
-            : "An unknown error occurred while searching books",
-      });
-    }
+    dispatch({ type: "UPDATE_FILTERS", payload: filters });
+    await fetchBooks(page, limit, filters);
   };
 
   const addBook = async (book: Omit<Book, "id">) => {
@@ -109,10 +102,9 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
 
   useEffect(() => {
     if (user) {
-      fetchBooks();
+      fetchBooks(1, 6, state.currentFilters);
       fetchGenres();
     } else {
-      // Reset books state when user logs out
       dispatch({
         type: "FETCH_BOOKS_SUCCESS",
         payload: {
@@ -122,6 +114,7 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
       });
       dispatch({ type: "FETCH_GENRES_SUCCESS", payload: [] });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (

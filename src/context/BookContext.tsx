@@ -5,7 +5,11 @@ import { BookActions, BookState } from "../reducers/bookReducer";
 type BookContextType = {
   state: BookState;
   dispatch: Dispatch<BookActions>;
-  fetchBooks: (page?: number, limit?: number) => Promise<void>;
+  fetchBooks: (
+    page?: number,
+    limit?: number,
+    filters?: BookFilters
+  ) => Promise<void>;
   searchBooks: (
     filters: BookFilters,
     page?: number,

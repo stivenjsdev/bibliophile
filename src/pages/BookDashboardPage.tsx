@@ -27,13 +27,13 @@ export default function BookDashboard() {
     deleteBook,
     fetchGenres,
   } = useBook();
-  const { books, pagination, loading, error, genres } = state;
+  const { books, pagination, loading, error, genres, currentFilters } = state;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
-  const [filters, setFilters] = useState<BookFilters>({});
+  const [localFilters, setLocalFilters] = useState<BookFilters>(currentFilters);
 
   useEffect(() => {
-    fetchBooks();
+    fetchBooks(1, undefined, currentFilters);
     fetchGenres();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -48,8 +48,8 @@ export default function BookDashboard() {
 
   const handleFilterChange = useCallback(
     (key: keyof BookFilters, value: string | number | null) => {
-      setFilters((prev) => {
-        const newFilters = { ...prev, [key]: value };
+      setLocalFilters((prevFilters) => {
+        const newFilters = { ...prevFilters, [key]: value };
         debouncedSearch(newFilters);
         return newFilters;
       });
@@ -57,33 +57,26 @@ export default function BookDashboard() {
     [debouncedSearch]
   );
 
-  const handleAddBook = useCallback(
-    async (newBook: Omit<Book, "id">) => {
-      await addBook(newBook);
+  const handleAddBook = async (newBook: Omit<Book, "id">) => {
+    await addBook(newBook);
+    setIsDialogOpen(false);
+  };
+
+  const handleEditBook = async (
+    updatedBook: Omit<Book, "id"> & { id?: number }
+  ) => {
+    if (updatedBook.id) {
+      await updateBook(updatedBook.id, updatedBook);
       setIsDialogOpen(false);
-    },
-    [addBook]
-  );
+      setEditingBook(null);
+    }
+  };
 
-  const handleEditBook = useCallback(
-    async (updatedBook: Omit<Book, "id"> & { id?: number }) => {
-      if (updatedBook.id) {
-        await updateBook(updatedBook.id, updatedBook);
-        setIsDialogOpen(false);
-        setEditingBook(null);
-      }
-    },
-    [updateBook]
-  );
+  const handleDeleteBook = async (id: number) => {
+    await deleteBook(id);
+  };
 
-  const handleDeleteBook = useCallback(
-    async (id: number) => {
-      await deleteBook(id);
-    },
-    [deleteBook]
-  );
-
-  const getStatusText = useCallback((status: BookStatus): string => {
+  const getStatusText = (status: BookStatus): string => {
     switch (status) {
       case BookStatus.TO_READ:
         return "Por leer";
@@ -94,7 +87,7 @@ export default function BookDashboard() {
       default:
         return "Desconocido";
     }
-  }, []);
+  };
 
   const handleEditClick = (book: Book) => {
     setEditingBook(book);
@@ -106,6 +99,10 @@ export default function BookDashboard() {
     setIsDialogOpen(false);
   };
 
+  const handlePageChange = (page: number) => {
+    fetchBooks(page, pagination?.limit, localFilters);
+  };
+
   if (loading) return <BookDashboardSkeleton />;
   if (error) return <div>Error: {error}</div>;
 
@@ -113,7 +110,7 @@ export default function BookDashboard() {
     <div className="min-h-screen flex flex-col">
       <div className="container mx-auto p-4 flex-grow">
         <BookSearch
-          filters={filters}
+          filters={localFilters}
           onFilterChange={handleFilterChange}
           uniqueGenres={genres}
           autoFocus={true}
@@ -150,7 +147,7 @@ export default function BookDashboard() {
           pagination={{
             totalPages: pagination?.totalPages || 1,
             currentPage: pagination?.page || 1,
-            onPageChange: (page) => fetchBooks(page, pagination?.limit),
+            onPageChange: handlePageChange,
           }}
         />
       </div>
