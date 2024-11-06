@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,7 +16,6 @@ type BookSearchProps = {
     key: keyof BookFilters,
     value: string | number | null
   ) => void;
-  onSearch: () => void;
   uniqueGenres: string[];
   autoFocus?: boolean;
 };
@@ -25,7 +23,6 @@ type BookSearchProps = {
 export const BookSearch = ({
   filters,
   onFilterChange,
-  onSearch,
   uniqueGenres,
   autoFocus = false,
 }: BookSearchProps) => {
@@ -90,7 +87,6 @@ export const BookSearch = ({
           </SelectContent>
         </Select>
       </div>
-      <Button onClick={onSearch}>Buscar</Button>
     </div>
   );
 };

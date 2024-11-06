@@ -12,7 +12,6 @@ export const BookDashboardSkeleton = () => {
             <Skeleton className="h-10 w-full sm:w-[180px]" />
             <Skeleton className="h-10 w-full sm:w-[180px]" />
           </div>
-          <Skeleton className="h-10 w-24" />
         </div>
 
         {/* Add Book button skeleton */}

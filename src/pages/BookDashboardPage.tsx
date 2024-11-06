@@ -46,17 +46,11 @@ export default function BookDashboard() {
     [searchBooks]
   );
 
-  const handleSearch = useCallback(() => {
-    searchBooks(filters);
-  }, [searchBooks, filters]);
-
   const handleFilterChange = useCallback(
     (key: keyof BookFilters, value: string | number | null) => {
       setFilters((prev) => {
         const newFilters = { ...prev, [key]: value };
-        if (key === "title") {
-          debouncedSearch(newFilters);
-        }
+        debouncedSearch(newFilters);
         return newFilters;
       });
     },
@@ -121,7 +115,6 @@ export default function BookDashboard() {
         <BookSearch
           filters={filters}
           onFilterChange={handleFilterChange}
-          onSearch={handleSearch}
           uniqueGenres={genres}
           autoFocus={true}
         />
