@@ -46,6 +46,11 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
     try {
       const newBook = await bookService.createBook(book);
       dispatch({ type: "ADD_BOOK", payload: newBook });
+      await fetchBooks(
+        state.pagination.page,
+        state.pagination.limit,
+        state.currentFilters
+      );
     } catch (error) {
       dispatch({
         type: "FETCH_BOOKS_ERROR",
@@ -61,6 +66,11 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
     try {
       const updatedBook = await bookService.updateBook(id, book);
       dispatch({ type: "UPDATE_BOOK", payload: updatedBook });
+      await fetchBooks(
+        state.pagination.page,
+        state.pagination.limit,
+        state.currentFilters
+      );
     } catch (error) {
       dispatch({
         type: "FETCH_BOOKS_ERROR",
@@ -76,6 +86,15 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
     try {
       await bookService.deleteBook(id);
       dispatch({ type: "DELETE_BOOK", payload: id });
+
+      // Determinar la página a la que se debe navegar después de la eliminación
+      const newPage =
+        state.books.length === 1 && state.pagination.page > 1
+          ? state.pagination.page - 1 // Si es el último libro de la página y no es la primera página, retroceder una página
+          : state.pagination.page; // De lo contrario, mantener la página actual
+
+      // Volver a cargar los libros con la página actualizada
+      await fetchBooks(newPage, state.pagination.limit, state.currentFilters);
     } catch (error) {
       dispatch({
         type: "FETCH_BOOKS_ERROR",

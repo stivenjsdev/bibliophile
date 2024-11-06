@@ -38,11 +38,15 @@ export default function BookDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    setLocalFilters(currentFilters);
+  }, [currentFilters]);
+
   const debouncedSearch = useMemo(
     () =>
       debounce((filters: BookFilters) => {
         searchBooks(filters);
-      }, 500),
+      }, 600),
     [searchBooks]
   );
 
