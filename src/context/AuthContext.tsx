@@ -1,9 +1,9 @@
-import { User } from "@/types";
-import { createContext } from "react";
+import { AuthActions, AuthState } from "@/reducers/authReducer";
+import { createContext, Dispatch } from "react";
 
 type AuthContextType = {
-  user: User | null;
-  loading: boolean;
+  state: AuthState;
+  dispatch: Dispatch<AuthActions>;
   login: (phone: string, password: string) => Promise<void>;
   register: (name: string, phone: string, password: string) => Promise<void>;
   logout: () => void;

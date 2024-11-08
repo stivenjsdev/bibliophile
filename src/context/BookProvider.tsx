@@ -11,7 +11,8 @@ type BookContextProviderProps = {
 
 export const BookProvider = ({ children }: BookContextProviderProps) => {
   const [state, dispatch] = useReducer(bookReducer, initialState);
-  const { user } = useAuth();
+  const { state: authState } = useAuth();
+  const { user } = authState;
 
   const fetchBooks = async (
     page: number = 1,

@@ -55,6 +55,7 @@ const LandingPage = ({ scrollPosition }: LandingPageProps) => {
               varius metus at eros feugiat fringilla.
             </p>
           </div>
+          {/* Hero Image */}
           <div className="w-full md:w-1/2 lg:w-[600px] mx-auto">
             <LazyLoadImage
               alt="Feature illustration"

@@ -1,57 +1,55 @@
+// AuthProvider.tsx
 import { AuthContext } from "@/context/AuthContext";
-import { User } from "@/types";
+import { authReducer, initialAuthState } from "@/reducers/authReducer";
 import axios from "axios";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useReducer } from "react";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-type AuthContextProviderProps = {
+type AuthProviderProps = {
   children: ReactNode;
 };
 
-export const AuthProvider = ({ children }: AuthContextProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [state, dispatch] = useReducer(authReducer, initialAuthState);
 
   useEffect(() => {
     const validateToken = async () => {
       const token = localStorage.getItem("token");
       if (token) {
+        dispatch({ type: "LOGIN_START" });
         try {
           const response = await axios.get(`${API_URL}/auth/validate`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          if (response.data.user) {
-            setUser(response.data.user);
-          }
+          dispatch({ type: "LOGIN_SUCCESS", payload: response.data.user });
         } catch (error) {
           console.error("Error validating token:", error);
           localStorage.removeItem("token");
+          dispatch({
+            type: "LOGIN_ERROR",
+            payload: "Token invalid or expired",
+          });
         }
       }
-      setLoading(false);
     };
 
     validateToken();
   }, []);
 
   const login = async (phone: string, password: string) => {
+    dispatch({ type: "LOGIN_START" });
     try {
       const response = await axios.post(`${API_URL}/auth/login`, {
         phone,
         password,
       });
-      const { token } = response.data;
+      const { token, user } = response.data;
       localStorage.setItem("token", token);
-
-      // Validar el token para obtener los datos del usuario
-      const userResponse = await axios.get(`${API_URL}/auth/validate`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(userResponse.data.user);
+      dispatch({ type: "LOGIN_SUCCESS", payload: user });
     } catch (error) {
       console.error("Error logging in:", error);
-      throw error;
+      dispatch({ type: "LOGIN_ERROR", payload: "Error logging in" });
     }
   };
 
@@ -68,11 +66,11 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    dispatch({ type: "LOGOUT" });
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ state, dispatch, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

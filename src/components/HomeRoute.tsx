@@ -3,7 +3,8 @@ import LandingPage from "@/pages/LandingPage";
 import { Navigate } from "react-router-dom";
 
 const HomeRoute = () => {
-  const { user } = useAuth();
+  const { state: authState } = useAuth();
+  const { user } = authState;
 
   if (user) {
     return <Navigate to="/dashboard" replace />;

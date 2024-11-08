@@ -3,7 +3,8 @@ import { Navigate, Outlet } from "react-router-dom";
 import { BookDashboardSkeleton } from "./BookDashboardSkeleton";
 
 const ProtectedRoute = () => {
-  const { user, loading } = useAuth();
+  const { state: authState } = useAuth();
+  const { user, loading } = authState;
 
   if (loading) return <BookDashboardSkeleton />;
 
