@@ -137,6 +137,13 @@ export const BookProvider = ({ children }: BookContextProviderProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      fetchGenres();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.books]);
+
   return (
     <BookContext.Provider
       value={{

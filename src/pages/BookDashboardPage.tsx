@@ -18,25 +18,12 @@ import { Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function BookDashboard() {
-  const {
-    state,
-    fetchBooks,
-    searchBooks,
-    addBook,
-    updateBook,
-    deleteBook,
-    fetchGenres,
-  } = useBook();
+  const { state, fetchBooks, searchBooks, addBook, updateBook, deleteBook } =
+    useBook();
   const { books, pagination, loading, error, genres, currentFilters } = state;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [localFilters, setLocalFilters] = useState<BookFilters>(currentFilters);
-
-  useEffect(() => {
-    fetchBooks(1, undefined, currentFilters);
-    fetchGenres();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     setLocalFilters(currentFilters);
@@ -108,6 +95,8 @@ export default function BookDashboard() {
   };
 
   if (loading) return <BookDashboardSkeleton />;
+
+  // Error al cargar los libros
   if (error) return <div>Error: {error}</div>;
 
   return (
