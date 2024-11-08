@@ -1,10 +1,8 @@
 // AuthProvider.tsx
 import { AuthContext } from "@/context/AuthContext";
 import { authReducer, initialAuthState } from "@/reducers/authReducer";
-import axios from "axios";
+import authService from "@/services/authService";
 import { ReactNode, useEffect, useReducer } from "react";
-
-const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -13,16 +11,15 @@ type AuthProviderProps = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, dispatch] = useReducer(authReducer, initialAuthState);
 
+  // useEffect para validar el token al cargar el proveedor
   useEffect(() => {
     const validateToken = async () => {
       const token = localStorage.getItem("token");
       if (token) {
         dispatch({ type: "LOGIN_START" });
         try {
-          const response = await axios.get(`${API_URL}/auth/validate`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          dispatch({ type: "LOGIN_SUCCESS", payload: response.data.user });
+          const user = await authService.validateToken(token);
+          dispatch({ type: "LOGIN_SUCCESS", payload: user });
         } catch (error) {
           console.error("Error validating token:", error);
           localStorage.removeItem("token");
@@ -40,11 +37,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (phone: string, password: string) => {
     dispatch({ type: "LOGIN_START" });
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        phone,
-        password,
-      });
-      const { token, user } = response.data;
+      const { token, user } = await authService.login(phone, password);
       localStorage.setItem("token", token);
       dispatch({ type: "LOGIN_SUCCESS", payload: user });
     } catch (error) {
@@ -55,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const register = async (name: string, phone: string, password: string) => {
     try {
-      await axios.post(`${API_URL}/auth/register`, { name, phone, password });
+      await authService.register(name, phone, password);
       // Después del registro exitoso, iniciamos sesión con las credenciales proporcionadas
       await login(phone, password);
     } catch (error) {
