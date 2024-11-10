@@ -97,7 +97,7 @@ export default function BookDashboard() {
   if (loading) return <BookDashboardSkeleton />;
 
   // Error al cargar los libros
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div>Error: {error}. Por favor recargue la página</div>;
 
   return (
     <div className="min-h-screen flex flex-col">
