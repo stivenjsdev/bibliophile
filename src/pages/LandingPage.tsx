@@ -44,26 +44,49 @@ const LandingPage = ({ scrollPosition }: LandingPageProps) => {
       </section>
 
       {/* Informative Sections */}
-      <section className="w-full bg-white h-[539px]">
-        <div className="container mx-auto py-16 px-4 md:flex md:space-x-8 items-center">
-          <div className="flex-1 mb-8 md:mb-0 text-center md:text-left">
-            <h3 className="text-3xl font-semibold text-[rgb(34,34,34)] mb-4">
+      <section className="w-full bg-white flex justify-center py-6 px-4">
+        <div className="container flex flex-col gap-4 justify-between items-center md:flex-row md:gap-6">
+          {/* Content */}
+          <div className="flex flex-col gap-2 items-center flex-1">
+            <h3 className="text-3xl font-semibold text-[rgb(34,34,34)]">
               Características Avanzadas
             </h3>
-            <p className="text-[rgb(119,119,119)]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-              varius metus at eros feugiat fringilla.
+            <p className="text-[rgb(119,119,119)] text-justify">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam
+              ipsa reiciendis, ipsam blanditiis nostrum doloremque repellendus
+              sapiente ab. Totam, voluptas aut ab debitis dolorum ducimus
+              maiores corporis eaque perspiciatis! Aliquam eum dolor aspernatur
+              praesentium magnam rerum repellat soluta nulla, vero quasi sit
+              ipsum quam amet dignissimos eveniet itaque harum omnis ducimus
+              sequi dolores consectetur? Est, ea! In fuga, dolor repellendus
+              iusto facere doloremque praesentium error pariatur magnam rem
+              eligendi accusamus a, qui ducimus deleniti, obcaecati velit eaque
+              delectus quidem dicta. Doloremque itaque quia ratione quibusdam
+              enim esse exercitationem autem voluptatibus? Aspernatur, inventore
+              laboriosam. Officia fugit magnam sequi veniam at distinctio.
             </p>
           </div>
           {/* Hero Image */}
-          <div className="w-full md:w-1/2 lg:w-[600px] mx-auto">
-            <LazyLoadImage
-              alt="Feature illustration"
-              src={heroImage}
-              scrollPosition={scrollPosition}
-              className="rounded-lg shadow-lg w-full h-auto"
-              visibleByDefault={true}
-            />
+          <div className="flex-1 flex justify-center">
+            <div className="bg-neutral-300 rounded-md shadow-lg overflow-hidden aspect-[3/2] max-w-[600px]">
+              <LazyLoadImage
+                alt="Feature illustration"
+                width={600}
+                height={400}
+                src={heroImage}
+                scrollPosition={scrollPosition}
+                className="object-cover"
+                visibleByDefault={true}
+              />
+              {/* <img
+                src={heroImage}
+                alt="Feature illustration"
+                width={600}
+                height={400}
+                className="object-cover"
+                loading="lazy"
+              /> */}
+            </div>
           </div>
         </div>
       </section>
