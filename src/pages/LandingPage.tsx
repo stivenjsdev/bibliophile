@@ -1,4 +1,5 @@
 import heroImage from "@/assets/hero-image.webp";
+import imagePlaceholder from '@/assets/placeholder-image.webp';
 import CustomerReviews from "@/components/CustomerReviews";
 import LazyComponent from "@/components/LazyComponent";
 import useScrollToTop from "@/hooks/useScrollToTop";
@@ -75,6 +76,7 @@ const LandingPage = ({ scrollPosition }: LandingPageProps) => {
                 scrollPosition={scrollPosition}
                 className="object-cover"
                 visibleByDefault={true}
+                placeholderSrc={imagePlaceholder}
               />
               {/* <img
                 src={heroImage}
@@ -90,16 +92,32 @@ const LandingPage = ({ scrollPosition }: LandingPageProps) => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="container mx-auto py-16 text-center px-4">
-        <h2 className="text-3xl md:text-5xl font-bold text-[rgb(34,34,34)] mb-8">
-          Nuestros Clientes
-        </h2>
-        <CustomerReviews scrollPosition={scrollPosition} />
+      <section className="w-full py-10 px-4 flex justify-center">
+        <div className="container flex flex-col gap-6 items-center">
+          <h2 className="text-3xl font-bold text-[rgb(34,34,34)] text-center">
+            Nuestros Clientes
+          </h2>
+          <p className="text-[rgb(119,119,119)] text-justify mb-1">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam ipsa
+            reiciendis, ipsam blanditiis nostrum doloremque repellendus sapiente
+            ab. Totam, voluptas aut ab debitis dolorum ducimus maiores corporis
+            eaque perspiciatis! Aliquam eum dolor aspernatur praesentium magnam
+            rerum repellat soluta nulla, vero quasi sit ipsum quam amet
+            dignissimos eveniet itaque harum omnis ducimus sequi dolores
+            consectetur? Est, ea! In fuga, dolor repellendus iusto facere
+            doloremque praesentium error pariatur magnam rem eligendi accusamus
+            a, qui ducimus deleniti, obcaecati velit eaque delectus quidem
+            dicta. Doloremque itaque quia ratione quibusdam enim esse
+            exercitationem autem voluptatibus? Aspernatur, inventore laboriosam.
+            Officia fugit magnam sequi veniam at distinctio.
+          </p>
+          <CustomerReviews scrollPosition={scrollPosition} />
+        </div>
       </section>
 
       {/* Lazy Component */}
       <LazyLoadComponent
-        // placeholder={<div>Loading...</div>}
+      // placeholder={<div>Loading...</div>}
       >
         <LazyComponent />
       </LazyLoadComponent>
