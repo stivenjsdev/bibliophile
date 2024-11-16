@@ -1,15 +1,13 @@
 import heroImage from "@/assets/hero-image.webp";
 import CustomerReviews from "@/components/CustomerReviews";
+import LazyComponent from "@/components/LazyComponent";
 import useScrollToTop from "@/hooks/useScrollToTop";
-import { lazy } from "react";
 import {
   LazyLoadComponent,
   LazyLoadImage,
   trackWindowScroll,
 } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
-
-const LazyComponent = lazy(() => import("@/components/LazyComponent"));
 
 type LandingPageProps = {
   scrollPosition: { x: number; y: number };
@@ -101,14 +99,13 @@ const LandingPage = ({ scrollPosition }: LandingPageProps) => {
 
       {/* Lazy Component */}
       <LazyLoadComponent
-        scrollPosition={scrollPosition}
-        placeholder={<div>Loading...</div>}
+        // placeholder={<div>Loading...</div>}
       >
         <LazyComponent />
       </LazyLoadComponent>
 
       {/* Footer */}
-      <LazyLoadComponent scrollPosition={scrollPosition}>
+      <LazyLoadComponent>
         <footer className="w-full bg-gray-800 py-8 text-gray-200">
           <div className="container mx-auto flex flex-col md:flex-row justify-between items-center px-4 space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
